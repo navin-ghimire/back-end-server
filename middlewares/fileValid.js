@@ -7,7 +7,6 @@ export const validFile = (req, res, next) => {
   //file check
   if (!imageFile) return res.status(400).json({ message: 'please provide image file' });
   const extType = path.extname(imageFile.name);
-  
 
   //file extension check
   if (supportedExts.includes(extType)) {
@@ -26,14 +25,13 @@ export const validFile = (req, res, next) => {
 
 
 
-
 export const updateFile = (req, res, next) => {
   const imageFile = req.files?.image;
+
   //file check
   if (!imageFile) return next();
-  
+
   const extType = path.extname(imageFile.name);
-  
 
   //file extension check
   if (supportedExts.includes(extType)) {
