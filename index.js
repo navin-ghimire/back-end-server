@@ -11,7 +11,7 @@ const port = 5000;
 const app = express();
 
 
-mongoose.connect('mongodb+srv://rabyn900:moles900@cluster0.ikwdezp.mongodb.net/ShopUs').then((val) => {
+mongoose.connect('mongodb+srv://nabi12:myblog3@atlascluster.7gsq9.mongodb.net/ShopUs').then((val) => {
   app.listen(port, (e) => {
     console.log('connected');
   });
