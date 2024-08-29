@@ -8,26 +8,6 @@ export const getAllUsers = (req, res) => {
 }
 
 
-export const updateUsers = async (req, res) => {
-  const {id} = req.params;
-  try {
-    if(mongoose.isValidObjectId(id)){
-      const isExist = await User.findById(id);
-    if(!isExist) return res.status(404).json({message: 'user doesn\'t exist'});
-    await isExist.updateOne({
-      fullname: req.body.fullname || isExist.fullname,
-      email: req.body.email || isExist.email
-    });
-    return res.status(200).json({message: 'user updated'});
-    }else{
-      return res.status(400).json({message: 'please provide valid id'});
-    }
-    
-  } catch (err) {
-    return res.status(400).json({ error: `${err}` });
-  }
-}
-
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -78,4 +58,27 @@ export const registerUser = async (req, res) => {
   }
 
 
+}
+
+
+export const userUpdate = async (req, res) => {
+  const {id} = req.params;
+  const { email, fullname } = req.body;
+  try {
+    if(mongoose.isValidObjectId(id)){
+      const isExist = await User.findById(id);
+    if(!isExist) return res.status(404).json({message: 'user doesn\'t exist'});
+    await isExist.updateOne({
+      email: email || isExist.email,
+      fullname: fullname || isExist.fullname
+      
+    });
+    return res.status(200).json({message: 'successfully user updated'});
+    }else{
+      return res.status(404).json({message: 'please provide valid id'});
+    }
+    
+  } catch (err) {
+    return res.status(400).json({ error: `${err}` });
+  }
 }
