@@ -1,3 +1,4 @@
+import { match } from "assert";
 import { Product } from "../models/Product.js"
 import fs from 'fs';
 import mongoose from "mongoose";
@@ -14,25 +15,34 @@ export const getProducts = async (req, res) => {
       excludeObj.forEach((q) => {
           delete queryObj[q]
       });
+
+      if(req.query.search) {
+        queryObj.title = { $regex: req.query.search, $options: 'i' }
+      }
          
-      let query = Product.find(queryObj);
+      let qStr = JSON.stringify(queryObj);
+      qStr = qStr.replace(/\b(gte|gt|lte|lt|eq)\b/g, match => `$${match}`);
+      let query = Product.find(JSON.parse(qStr));
 
 
       if(req.query.sort) {
           const sorting = req.query.sort.split(',').join('').trim().split(/[\s,\t,\n]+/).join(' ');
-           query = query.sort(sorting);
+           query.sort(sorting);
         }
 
 
       if(req.query.fields) {
         const fields = req.query.fields.split(',').join('').trim().split(/[\s,\t,\n]+/).join(' ');
-         query = query.select(fields);
+        query.select(fields);
       }
 
       
+      const page = req.query.page || 1;
+      const limit = req.query.limit || 10;
     
-
-    const products = await query;
+       const skip = (page - 1) * limit;
+         
+    const products = await query.skip(skip).limit(limit);
 
     return res.status(200).json(products);
   } catch (err) {
