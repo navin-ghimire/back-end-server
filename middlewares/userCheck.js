@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 
-export const userCheck = (req, res, next) => {
+export const checkUser = (req, res, next) => {
   const token = req.headers.authorization;
 
   if (!token) return res.status(401).json({ message: 'you are not authorised' });

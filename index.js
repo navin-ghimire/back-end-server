@@ -1,7 +1,7 @@
 import express from "express";
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import orderRoutes from './routes/orderRoutes.js'
+import orderRoutes from './routes/orderRoutes.js';
 import mongoose from "mongoose";
 import cors from "cors";
 import morgan from "morgan";
@@ -24,7 +24,7 @@ mongoose.connect('mongodb+srv://nabi12:myblog3@atlascluster.7gsq9.mongodb.net/Sh
 
 app.use(express.json());
 app.use(cors());
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static('uploads'))
 app.use(morgan('dev'));
 
 app.use(fileUpload({
@@ -35,7 +35,7 @@ app.use(fileUpload({
 
 
 app.get('/', (req, res) => {
-  return res.status(200).json({ data: 'welcome to server' });
+  return res.status(200).json({ data: 'hello jee' });
 });
 
 

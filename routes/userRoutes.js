@@ -1,9 +1,9 @@
+import { getAllUsers, loginUser, registerUser, updateUser } from "../controllers/userController.js";
 import express from "express";
-import { getAllUsers, loginUser, registerUser, userUpdate } from "../controllers/userController.js";
 import { notAllowed } from "../utils/shareFunc.js";
 import Joi from 'joi';
 import expressJoi from 'express-joi-validation';
-import { userCheck } from "../middlewares/userCheck.js";
+import { checkUser } from "../middlewares/userCheck.js";
 
 const validatior = expressJoi.createValidator({});
 
@@ -30,13 +30,9 @@ const router = express.Router();
 
 router.route('/').get(getAllUsers);
 
-
 router.route('/login').post(validatior.body(loginSchema), loginUser).all(notAllowed);
-
 router.route('/register').post(validatior.body(registerSchema), registerUser).all(notAllowed);
-
-router.route('/:id').patch(userCheck, userUpdate).all(notAllowed);
+router.route('/:id').patch(checkUser, updateUser).all(notAllowed);
 
 
 export default router;
-

@@ -5,42 +5,41 @@ import mongoose from "mongoose";
 
 export const getProducts = async (req, res) => {
 
-
   try {
- const excludeObj = ['sort', 'page', 'search', 'fields', 'limit'];
+    const excludeObj = ['sort', 'page', 'search', 'fields', 'limit'];
 
-      const queryObj = {...req.query};
-      
-      excludeObj.forEach((q) => {
-          delete queryObj[q]
-      });
+    const queryObj = { ...req.query };
 
-      if(req.query.search) {
-        queryObj.title = { $regex: req.query.search, $options: 'i' }
-      }
-         
-      let qStr = JSON.stringify(queryObj);
-      qStr = qStr.replace(/\b(gte|gt|lte|lt|eq)\b/g, match => `$${match}`);
-      let query = Product.find(JSON.parse(qStr));
+    excludeObj.forEach((q) => {
+      delete queryObj[q]
+    });
 
+    if (req.query.search) {
+      queryObj.title = { $regex: req.query.search, $options: 'i' }
+    }
 
-      if(req.query.sort) {
-          const sorting = req.query.sort.split(',').join('').trim().split(/[\s,\t,\n]+/).join(' ');
-           query.sort(sorting);
-        }
+    let qStr = JSON.stringify(queryObj);
+    qStr = qStr.replace(/\b(gte|gt|lte|lt|eq)\b/g, match => `$${match}`);
+
+    let query = Product.find(JSON.parse(qStr));
 
 
-      if(req.query.fields) {
-        const fields = req.query.fields.split(',').join('').trim().split(/[\s,\t,\n]+/).join(' ');
-        query.select(fields);
-      }
+    if (req.query.sort) {
+      const sorting = req.query.sort.split(',').join('').trim().split(/[\s,\t,\n]+/).join(' ');
+      query.sort(sorting);
+    }
 
-      
-      const page = req.query.page || 1;
-      const limit = req.query.limit || 10;
-    
-       const skip = (page - 1) * limit;
-         
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join('').trim().split(/[\s,\t,\n]+/).join(' ');
+      query.select(fields);
+    }
+
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+
+    const skip = (page - 1) * limit;
+
+
     const products = await query.skip(skip).limit(limit);
 
     return res.status(200).json(products);
