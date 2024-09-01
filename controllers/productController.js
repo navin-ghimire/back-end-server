@@ -1,4 +1,3 @@
-import { match } from "assert";
 import { Product } from "../models/Product.js"
 import fs from 'fs';
 import mongoose from "mongoose";
