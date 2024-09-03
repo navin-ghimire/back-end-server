@@ -1,4 +1,3 @@
-import { error } from "console";
 import { Product } from "../models/Product.js"
 import fs from 'fs';
 import mongoose from "mongoose";
@@ -36,7 +35,7 @@ export const getProducts = async (req, res) => {
     }
 
     const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const limit = req.query.limit || 0;
 
     const skip = (page - 1) * limit;
 
@@ -53,7 +52,10 @@ export const getProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
   const { id } = req.params;
   try {
-    const product = await Product.findById(id).select('-createdAt -updatedAt -__v');
+    const product = await Product.findById(id).select('-createdAt -updatedAt -__v').populate({
+      path: 'reviews.user',
+      select: 'fullname email'
+    });
     return res.status(200).json(product);
   } catch (er) {
     return res.status(400).json({ error: `${err}` });
@@ -174,14 +176,28 @@ export const addReview = async (req, res) => {
 
   try {
     if (mongoose.isValidObjectId(id)) {
+      const isExist = await Product.findById(id);
       if(isExist) {
+        
+        // check if review already submitted
+        if (isExist.reviews.find((rev) => rev.user.toString() === req.userId)) {
+          return res.status(400).json({message: 'you already submitted a review'});
+        }
         const review = {
           user: req.userId,
-          name: req.user.fullname,
           rating: Number(rating),
           comment
         }
+
+        // add review
         isExist.reviews.push(review);
+
+        // calculate avg rating
+        const totalRating = isExist.reviews.reduce((prev, item) => prev + item.rating, 0);
+        const avg = totalRating / isExist.reviews.length;
+        isExist.rating = avg;
+
+        // save
         await isExist.save();
         return res.status(200).json({message: 'review added successfully'})
       }
