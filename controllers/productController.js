@@ -35,14 +35,18 @@ export const getProducts = async (req, res) => {
     }
 
     const page = req.query.page || 1;
-    const limit = req.query.limit || 0;
+    const limit = req.query.limit || 10;
 
     const skip = (page - 1) * limit;
 
 
     const products = await query.skip(skip).limit(limit);
+    const length = await Product.countDocuments();
 
-    return res.status(200).json(products);
+    return res.status(200).json({
+      products,
+      length
+    });
   } catch (err) {
     return res.status(400).json({ message: `${err}` });
   }
@@ -168,27 +172,30 @@ export const removeProduct = async (req, res) => {
 
     return res.status(400).json({ error: `${err}` });
   }
-} 
+}
+
+
 
 export const addReview = async (req, res) => {
-  const {id} = req.params;
-  const {rating, comment} = req.body;
+  const { id } = req.params;
+  const { rating, comment } = req.body;
 
   try {
     if (mongoose.isValidObjectId(id)) {
       const isExist = await Product.findById(id);
-      if(isExist) {
-        
+      if (isExist) {
+
         // check if review already submitted
         if (isExist.reviews.find((rev) => rev.user.toString() === req.userId)) {
-          return res.status(400).json({message: 'you already submitted a review'});
+          return res.status(400).json({ message: 'you already submitted a review' });
         }
+
+
         const review = {
           user: req.userId,
           rating: Number(rating),
           comment
         }
-
         // add review
         isExist.reviews.push(review);
 
@@ -199,11 +206,12 @@ export const addReview = async (req, res) => {
 
         // save
         await isExist.save();
-        return res.status(200).json({message: 'review added successfully'})
+
+        return res.status(200).json({ message: 'review added successfully' });
       }
     }
-    return res.status(400).json({message: 'please provide valid id'})
+    return res.status(400).json({ message: 'please provide valid id' });
   } catch (err) {
-    return res.status(400).json({error: `${err}`});
+    return res.status(400).json({ error: `${err}` });
   }
 } 
