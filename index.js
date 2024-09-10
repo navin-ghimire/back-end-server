@@ -88,7 +88,7 @@ mongoose.connect('mongodb+srv://nabi12:myblog3@atlascluster.7gsq9.mongodb.net/Sh
 
 
 app.use(express.json());
-app.use(cors({ origin: '*', credentials: true }));
+app.use(cors({ origin: '*'}));
 app.use('/uploads', express.static('uploads'))
 app.use(morgan('dev'));
 
